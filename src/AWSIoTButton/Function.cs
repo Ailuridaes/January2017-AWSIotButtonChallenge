@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 
 using Newtonsoft.Json;
 
@@ -26,12 +28,26 @@ namespace AWSIoTButton {
     public class Function {
 
         //--- Fields ---
+        private AmazonDynamoDBClient _client;
 
         //--- Constructors ---
-        public Function() { }
+        public Function() { 
+            _client = new AmazonDynamoDBClient();
+        }
 
         //--- Methods ---
         public string Handler(AWSIoTButtonEvent iot, ILambdaContext context) {
+            if(iot.ClickType == "LONG") {
+                ScanRequest request = new ScanRequest {
+                    TableName = "IoTButtonRecords3",
+                    AttributesToGet = new[] { "clickType" }.ToList()
+                };
+                var response = _client.ScanAsync(request).Result;
+                foreach(var item in response.Items) {
+                    Console.WriteLine($"clickType: {item["clickType"].S}");
+                }
+                Console.WriteLine("Click received!");
+            }
             return "Click received!";
         }
     }
