@@ -43,10 +43,13 @@ namespace AWSIoTButton {
                     AttributesToGet = new[] { "clickType" }.ToList()
                 };
                 var response = _client.ScanAsync(request).Result;
-                foreach(var item in response.Items) {
-                    Console.WriteLine($"clickType: {item["clickType"].S}");
-                }
-                Console.WriteLine("Click received!");
+
+                int singles = response.Items.Count(i => i["clickType"].S == "SINGLE");
+                int doubles = response.Items.Count(i => i["clickType"].S == "DOUBLE");
+                int longs = response.Items.Count(i => i["clickType"].S == "LONG");
+                Console.WriteLine($"Number of single clicks: {singles.ToString()}");
+                Console.WriteLine($"Number of double clicks: {doubles.ToString()}");
+                Console.WriteLine($"Number of long clicks: {longs.ToString()}");
             }
             return "Click received!";
         }
